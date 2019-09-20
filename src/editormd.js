@@ -325,7 +325,7 @@
     editormd.$katex       = null;
     editormd.$marked      = null;
     editormd.$CodeMirror  = null;
-    editormd.$prettyPrint = null;
+    editormd.$hljs        = null;
 
     var timer, flowchartTimer;
 
@@ -557,8 +557,10 @@
                             editormd.$marked = marked;
 
                             if (settings.previewCodeHighlight) {
-                                editormd.loadScript(loadPath + "prettify.min", function() {
-                                    loadFlowChartOrSequenceDiagram();
+                                editormd.loadCSS("//cdn.staticfile.org/highlight.js/9.15.10/styles/googlecode.min", function() {
+                                    editormd.loadScript(loadPath + "highlight.pack", function() {
+                                        loadFlowChartOrSequenceDiagram();
+                                    });
                                 });
                             } else {
                                 loadFlowChartOrSequenceDiagram();
@@ -1396,13 +1398,12 @@
 
         previewCodeHighlight : function() {
             var settings         = this.settings;
-            var previewContainer = this.previewContainer;
 
             if (settings.previewCodeHighlight) {
-                previewContainer.find("pre").addClass("prettyprint linenums");
-
-                if (typeof window.prettyPrint !== "undefined") {
-                    window.prettyPrint();
+                if (typeof window.hljs !== "undefined")
+                {
+                    hljs.initHighlighting.called = false;
+                    window.hljs.initHighlighting();
                 }
             }
 
@@ -3798,8 +3799,8 @@
         }
 
         if (settings.previewCodeHighlight) {
-            div.find("pre").addClass("prettyprint linenums");
-            window.prettyPrint();
+            window.hljs.initHighlighting.called = false;
+            window.hljs.initHighlighting();
         }
 
         if (!editormd.isIE8) {
